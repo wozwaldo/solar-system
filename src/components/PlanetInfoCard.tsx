@@ -1,43 +1,106 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './PlanetInfoCard.module.css';
 import { PLANET_INFOS } from './planetData';
 
-interface PlanetInfoCardProps { planet: string | null; onClose: () => void; }
+const GLYPHS = "█▓▒░<>/\\|+=*·01";
+
+// sci-fi decode effect: characters start as random glyphs and settle into the
+// real text left-to-right; renders instantly under prefers-reduced-motion
+function useDecodedText(text: string, framesPerChar = 2, delayFrames = 0) {
+  const [display, setDisplay] = useState(() =>
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches ? text : ''
+  );
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setDisplay(text);
+      return;
+    }
+    let frame = -delayFrames;
+    let raf = 0;
+    const tick = () => {
+      frame++;
+      const settled = Math.floor(frame / framesPerChar);
+      let out = '';
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (ch === ' ') { out += ' '; continue; }
+        out += i < settled ? ch : GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+      }
+      setDisplay(out);
+      if (settled < text.length) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [text, framesPerChar, delayFrames]);
+
+  return display;
+}
+
+function DecodeText({ text, framesPerChar = 2, delayFrames = 0 }: {
+  text: string; framesPerChar?: number; delayFrames?: number;
+}) {
+  const display = useDecodedText(text, framesPerChar, delayFrames);
+  return <>{display}</>;
+}
+
+interface PlanetInfoCardProps {
+  planet: string | null;
+  onClose: () => void;
+}
 
 const PlanetInfoCard: React.FC<PlanetInfoCardProps> = ({ planet, onClose }) => {
-  const cardRef = useRef<HTMLDivElement>(null);
-
   if (!planet) return null;
   const info = PLANET_INFOS[planet];
 
-  const handleMove = (e: React.PointerEvent) => {
-    const el = cardRef.current;
-    if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const r = el.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width - 0.5;
-    const y = (e.clientY - r.top) / r.height - 0.5;
-    el.style.transform = `perspective(700px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg)`;
-  };
-  const handleLeave = () => { if (cardRef.current) cardRef.current.style.transform = ''; };
+  const stats = [
+    { label: 'Distance from sun', value: info.distanceFromSun },
+    { label: 'Moons', value: info.moonCount },
+    { label: 'Day length', value: info.dayLength },
+    { label: 'Year length', value: info.yearLength },
+    { label: 'Mean temperature', value: info.temperature },
+  ];
 
   return (
-    <div className={styles.wrap}>
-      <div ref={cardRef} className={styles.holoBorder} onPointerMove={handleMove} onPointerLeave={handleLeave}>
-        <div className={styles.glass}>
-          <div className={styles.eyebrow}>Planet · {info.numeral}</div>
-          <h2 className={styles.title}>{info.title}</h2>
-          <p className={styles.desc}>{info.desc}</p>
-          <div className={styles.chips}>
-            <span className={styles.chip}>{info.distanceFromSun}</span>
-            <span className={styles.chip}>{info.moonCount}</span>
-            <span className={styles.chip}>day · {info.dayLength}</span>
+    <>
+      {/* identity + story, left of the planet */}
+      <aside className={styles.left} key={`left-${planet}`}>
+        <div className={styles.holoBorder}>
+          <div className={styles.glass}>
+            <div className={styles.eyebrow}>
+              <DecodeText text={`Planet · ${info.numeral}`} framesPerChar={3} />
+            </div>
+            <h2 className={styles.title}>
+              <DecodeText text={info.title.toUpperCase()} framesPerChar={5} delayFrames={8} />
+            </h2>
+            <div className={styles.hairline} />
+            <p className={styles.desc}>{info.desc}</p>
+            <button className={styles.close} onClick={onClose} data-hover>
+              Return to system
+            </button>
           </div>
-          <button className={styles.close} onClick={onClose} data-hover>
-            Return to system
-          </button>
         </div>
-      </div>
-    </div>
+      </aside>
+
+      {/* telemetry, right of the planet */}
+      <aside className={styles.right} key={`right-${planet}`}>
+        <div className={styles.holoBorder}>
+          <div className={styles.glass}>
+            <div className={styles.dataHeading}>
+              <DecodeText text="Telemetry" framesPerChar={3} />
+            </div>
+            {stats.map((stat, i) => (
+              <div key={stat.label} className={styles.statRow}>
+                <span className={styles.statLabel}>{stat.label}</span>
+                <span className={styles.statValue}>
+                  <DecodeText text={stat.value} framesPerChar={4} delayFrames={10 + i * 8} />
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </aside>
+    </>
   );
 };
 

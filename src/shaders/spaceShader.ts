@@ -21,7 +21,7 @@ float hash(vec3 p) {
 // Star layer function from original shader
 // hash threshold controls density: 0.99 keeps roughly half the stars vs 0.98
 float calcStarLayer(vec3 d, float intensity) {
-    return smoothstep(intensity, 0., length(fract(d) - 0.5)) * smoothstep(0.99, 1., hash(floor(d)));
+    return smoothstep(intensity, 0., length(fract(d) - 0.5)) * smoothstep(0.993, 1., hash(floor(d)));
 }
 
 // Noise function for nebula

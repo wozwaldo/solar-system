@@ -28,6 +28,8 @@ export interface PlanetInfo {
   distanceFromSun: string;
   moonCount: string;
   dayLength: string;
+  yearLength: string;
+  temperature: string;
 }
 
 export const PLANET_TEXTURES: Record<string, string> = {
@@ -49,6 +51,8 @@ export const PLANET_INFOS: Record<string, PlanetInfo> = {
     distanceFromSun: "57.9M km",
     moonCount: "0 moons",
     dayLength: "59 days",
+    yearLength: "88 days",
+    temperature: "167°C",
   },
   Venus: {
     title: "Venus",
@@ -57,6 +61,8 @@ export const PLANET_INFOS: Record<string, PlanetInfo> = {
     distanceFromSun: "108.2M km",
     moonCount: "0 moons",
     dayLength: "243 days",
+    yearLength: "225 days",
+    temperature: "464°C",
   },
   Earth: {
     title: "Earth",
@@ -65,6 +71,8 @@ export const PLANET_INFOS: Record<string, PlanetInfo> = {
     distanceFromSun: "149.6M km",
     moonCount: "1 moon",
     dayLength: "24 hours",
+    yearLength: "365 days",
+    temperature: "15°C",
   },
   Mars: {
     title: "Mars",
@@ -73,6 +81,8 @@ export const PLANET_INFOS: Record<string, PlanetInfo> = {
     distanceFromSun: "227.9M km",
     moonCount: "2 moons",
     dayLength: "24.6 hours",
+    yearLength: "687 days",
+    temperature: "-65°C",
   },
   Jupiter: {
     title: "Jupiter",
@@ -81,6 +91,8 @@ export const PLANET_INFOS: Record<string, PlanetInfo> = {
     distanceFromSun: "778.5M km",
     moonCount: "95 moons",
     dayLength: "9.9 hours",
+    yearLength: "11.9 years",
+    temperature: "-110°C",
   },
   Saturn: {
     title: "Saturn",
@@ -89,6 +101,8 @@ export const PLANET_INFOS: Record<string, PlanetInfo> = {
     distanceFromSun: "1.43B km",
     moonCount: "146 moons",
     dayLength: "10.7 hours",
+    yearLength: "29.4 years",
+    temperature: "-140°C",
   },
   Uranus: {
     title: "Uranus",
@@ -97,6 +111,8 @@ export const PLANET_INFOS: Record<string, PlanetInfo> = {
     distanceFromSun: "2.87B km",
     moonCount: "28 moons",
     dayLength: "17.2 hours",
+    yearLength: "84 years",
+    temperature: "-195°C",
   },
   Neptune: {
     title: "Neptune",
@@ -105,6 +121,8 @@ export const PLANET_INFOS: Record<string, PlanetInfo> = {
     distanceFromSun: "4.5B km",
     moonCount: "16 moons",
     dayLength: "16.1 hours",
+    yearLength: "165 years",
+    temperature: "-200°C",
   },
 };
 
