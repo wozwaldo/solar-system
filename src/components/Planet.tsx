@@ -4,6 +4,7 @@ import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import { PlanetData, PLANET_TEXTURES } from "./planetData";
 import PlanetRing from "./PlanetRing";
+import Atmosphere from "./Atmosphere";
 
 export interface PlanetProps {
   data: PlanetData;
@@ -59,6 +60,7 @@ export default function Planet({ data, visible, selected, hovered, onClick, onAn
           <sphereGeometry args={[data.radius, 64, 64]} />
           <meshStandardMaterial map={texture} roughness={0.9} metalness={0} />
         </mesh>
+        <Atmosphere radius={data.radius} color={data.atmosphereColor} hovered={hovered} />
         {data.ring && <PlanetRing name={data.name} ring={data.ring} />}
       </group>
       {data.moons.map((moon, i) => (
