@@ -109,13 +109,30 @@ export default function SolarSystem() {
   const [muted, setMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  const cardOpenSound = useMemo(() => {
+    const sound = new Audio('/sounds/card-open.mp3');
+    sound.volume = 0.15;
+    sound.playbackRate = 2;
+    return sound;
+  }, []);
+
+  const cardCloseSound = useMemo(() => {
+    const sound = new Audio('/sounds/card-close.mp3');
+    sound.volume = 0.15;
+    return sound;
+  }, []);
+
   const handlePlanetClick = (planetName: string) => {
     playCardOpen();
+    cardOpenSound.currentTime = 0;
+    cardOpenSound.play().catch(() => {});
     setSelectedPlanet(planetName);
   }
 
   const handleClose = () => {
     playCardClose();
+    cardCloseSound.currentTime = 0;
+    cardCloseSound.play().catch(() => {});
     setSelectedPlanet(null);
     setResetCamera(true);
   };
@@ -211,7 +228,12 @@ export default function SolarSystem() {
           enableDamping
           minDistance={20}
           maxDistance={200}
-          onStart={() => { cursorState.drag = true; }}
+          onStart={() => {
+            cursorState.drag = true;
+            // a manual drag takes over the camera: cancel any pending
+            // return-to-overview animation so it can't fight the user
+            setResetCamera(false);
+          }}
           onEnd={() => { cursorState.drag = false; }}
         />
         <EffectComposer>
