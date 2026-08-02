@@ -1,9 +1,3 @@
-@property --a {
-  syntax: "<angle>";
-  initial-value: 0deg;
-  inherits: false;
-}
-
 /* ---- side panels: planet stays visible center-stage ---- */
 
 .left,
@@ -35,23 +29,25 @@
   to   { opacity: 1; transform: translateY(-50%); }
 }
 
-/* ---- shared frosted glass + holographic border ---- */
+/* ---- liquid glass: deep blur, specular top edge, soft organic form ---- */
 
-.holoBorder {
-  padding: 1px;
-  border-radius: 18px;
-  background: conic-gradient(from var(--a), var(--lilac), var(--rose), var(--ice), var(--lilac));
-  animation: spin 7s linear infinite;
-}
-
-@keyframes spin { to { --a: 360deg; } }
-
-.glass {
-  border-radius: 17px;
-  padding: 26px 28px 24px;
-  background: rgba(13, 11, 18, 0.82);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+.panel {
+  border-radius: 26px;
+  padding: 28px 30px 26px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.09),
+    rgba(255, 255, 255, 0.025) 45%,
+    rgba(199, 184, 255, 0.05) 75%,
+    rgba(255, 184, 209, 0.04)
+  );
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+    0 18px 44px rgba(0, 0, 0, 0.45);
 }
 
 /* ---- left panel: identity ---- */
@@ -87,8 +83,7 @@
 .hairline {
   height: 1px;
   margin: 16px 0;
-  background: linear-gradient(90deg, var(--lilac), var(--rose), transparent);
-  opacity: 0.5;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.06), transparent);
 }
 
 .desc {
@@ -109,20 +104,21 @@
   color: var(--pearl);
   padding: 9px 20px;
   border-radius: 999px;
-  border: 1px solid rgba(199, 184, 255, 0.45);
-  background: rgba(199, 184, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
   cursor: pointer;
   transition: background 300ms ease, border-color 300ms ease;
 }
 
 .close:hover,
 .close:focus-visible {
-  background: rgba(199, 184, 255, 0.18);
-  border-color: var(--rose);
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.32);
   outline: none;
 }
 
-.close:focus-visible { box-shadow: 0 0 0 2px rgba(168, 228, 255, 0.5); }
+.close:focus-visible { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 0 0 2px rgba(168, 228, 255, 0.5); }
 
 /* ---- right panel: telemetry ---- */
 
@@ -144,7 +140,7 @@
   align-items: baseline;
   gap: 14px;
   padding: 9px 0;
-  border-bottom: 1px solid rgba(199, 184, 255, 0.14);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
 }
 
 .statRow:last-child { border-bottom: 0; padding-bottom: 0; }
@@ -190,5 +186,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .left, .right, .holoBorder, .title { animation: none; }
+  .left, .right, .title { animation: none; }
 }

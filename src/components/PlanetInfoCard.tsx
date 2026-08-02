@@ -63,42 +63,34 @@ const PlanetInfoCard: React.FC<PlanetInfoCardProps> = ({ planet, onClose }) => {
 
   return (
     <>
-      {/* identity + story, left of the planet */}
-      <aside className={styles.left} key={`left-${planet}`}>
-        <div className={styles.holoBorder}>
-          <div className={styles.glass}>
-            <div className={styles.eyebrow}>
-              <DecodeText text={`Planet · ${info.numeral}`} framesPerChar={3} />
-            </div>
-            <h2 className={styles.title}>
-              <DecodeText text={info.title.toUpperCase()} framesPerChar={5} delayFrames={8} />
-            </h2>
-            <div className={styles.hairline} />
-            <p className={styles.desc}>{info.desc}</p>
-            <button className={styles.close} onClick={onClose} data-hover>
-              Return to system
-            </button>
-          </div>
+      {/* identity + story, floating left of the planet */}
+      <aside className={`${styles.left} ${styles.panel}`} key={`left-${planet}`}>
+        <div className={styles.eyebrow}>
+          <DecodeText text={`Planet · ${info.numeral}`} framesPerChar={3} />
         </div>
+        <h2 className={styles.title}>
+          <DecodeText text={info.title.toUpperCase()} framesPerChar={5} delayFrames={8} />
+        </h2>
+        <div className={styles.hairline} />
+        <p className={styles.desc}>{info.desc}</p>
+        <button className={styles.close} onClick={onClose} data-hover>
+          Return to system
+        </button>
       </aside>
 
-      {/* telemetry, right of the planet */}
-      <aside className={styles.right} key={`right-${planet}`}>
-        <div className={styles.holoBorder}>
-          <div className={styles.glass}>
-            <div className={styles.dataHeading}>
-              <DecodeText text="Telemetry" framesPerChar={3} />
-            </div>
-            {stats.map((stat, i) => (
-              <div key={stat.label} className={styles.statRow}>
-                <span className={styles.statLabel}>{stat.label}</span>
-                <span className={styles.statValue}>
-                  <DecodeText text={stat.value} framesPerChar={4} delayFrames={10 + i * 8} />
-                </span>
-              </div>
-            ))}
-          </div>
+      {/* telemetry, floating right of the planet */}
+      <aside className={`${styles.right} ${styles.panel}`} key={`right-${planet}`}>
+        <div className={styles.dataHeading}>
+          <DecodeText text="Telemetry" framesPerChar={3} />
         </div>
+        {stats.map((stat, i) => (
+          <div key={stat.label} className={styles.statRow}>
+            <span className={styles.statLabel}>{stat.label}</span>
+            <span className={styles.statValue}>
+              <DecodeText text={stat.value} framesPerChar={4} delayFrames={10 + i * 8} />
+            </span>
+          </div>
+        ))}
       </aside>
     </>
   );
