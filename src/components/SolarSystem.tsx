@@ -10,6 +10,7 @@ import PlanetInfoCard from './PlanetInfoCard';
 import Hud from './Hud';
 import Cursor from './Cursor';
 import { cursorState } from './cursorState';
+import { playCardOpen, playCardClose } from './uiSounds';
 import { PLANETS } from './planetData';
 import Sun from './Sun';
 import Planet from './Planet';
@@ -108,30 +109,13 @@ export default function SolarSystem() {
   const [muted, setMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  const cardOpenSound = useMemo(() => {
-    const sound = new Audio('/sounds/card-open.mp3');
-    sound.volume = 0.5;
-    sound.playbackRate = 2;
-    return sound;
-  }, []);
-
-  const cardCloseSound = useMemo(() => {
-    const sound = new Audio('/sounds/card-close.mp3');
-    sound.volume = 0.5;
-    return sound;
-  }, []);
-    
   const handlePlanetClick = (planetName: string) => {
-    cardOpenSound.currentTime = 0;
-    cardOpenSound.play();
-
+    playCardOpen();
     setSelectedPlanet(planetName);
   }
 
   const handleClose = () => {
-    cardCloseSound.currentTime = 0;
-    cardCloseSound.play();
-
+    playCardClose();
     setSelectedPlanet(null);
     setResetCamera(true);
   };
