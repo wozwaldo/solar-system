@@ -21,9 +21,14 @@ export default function Planet({ data, visible, selected, hovered, onClick, onAn
   texture.colorSpace = THREE.SRGBColorSpace;
   const moonTexture = useTexture("/textures/2k_moon.jpg");
   moonTexture.colorSpace = THREE.SRGBColorSpace;
+  const nightMap = useTexture("/textures/2k_earth_nightmap.jpg");
+  const cloudsMap = useTexture("/textures/2k_earth_clouds.jpg");
+  nightMap.colorSpace = THREE.SRGBColorSpace;
+  const isEarth = data.name === "Earth";
 
   const orbitRef = useRef<THREE.Group>(null);
   const spinRef = useRef<THREE.Mesh>(null);
+  const cloudsRef = useRef<THREE.Mesh>(null);
   const moonRefs = useRef<(THREE.Group | null)[]>([]);
   const angle = useRef(Math.random() * Math.PI * 2);
   const moonAngles = useRef(data.moons.map(() => Math.random() * Math.PI * 2));
@@ -37,6 +42,7 @@ export default function Planet({ data, visible, selected, hovered, onClick, onAn
     }
     onAngleUpdate(data.name, angle.current);
     if (spinRef.current) spinRef.current.rotation.y += selected ? 0.0015 : 0.004;
+    if (cloudsRef.current) cloudsRef.current.rotation.y += 0.0006;
     data.moons.forEach((moon, i) => {
       moonAngles.current[i] += moon.speed;
       const g = moonRefs.current[i];
@@ -58,10 +64,23 @@ export default function Planet({ data, visible, selected, hovered, onClick, onAn
           onPointerOut={() => onHover(null)}
         >
           <sphereGeometry args={[data.radius, 64, 64]} />
-          <meshStandardMaterial map={texture} roughness={0.9} metalness={0} />
+          <meshStandardMaterial
+            map={texture}
+            roughness={0.9}
+            metalness={0}
+            emissiveMap={isEarth ? nightMap : null}
+            emissive={isEarth ? new THREE.Color("#ffd9a0") : new THREE.Color("#000000")}
+            emissiveIntensity={isEarth ? 0.55 : 0}
+          />
         </mesh>
         <Atmosphere radius={data.radius} color={data.atmosphereColor} hovered={hovered} />
         {data.ring && <PlanetRing name={data.name} ring={data.ring} />}
+        {isEarth && (
+          <mesh ref={cloudsRef} scale={1.015} raycast={() => null}>
+            <sphereGeometry args={[data.radius, 64, 64]} />
+            <meshStandardMaterial color="#ffffff" alphaMap={cloudsMap} transparent depthWrite={false} />
+          </mesh>
+        )}
       </group>
       {data.moons.map((moon, i) => (
         <group key={moon.name} ref={(el) => { moonRefs.current[i] = el; }}>
