@@ -10,28 +10,7 @@ import PlanetInfoCard from './PlanetInfoCard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faVolumeUp, faVolumeMute } from '@fortawesome/free-solid-svg-icons';
 import styles from './SolarSystem.module.css';
-
-const PLANET_TEXTURES: Record<string, string> = {
-  Mercury: "/textures/2k_mercury.jpg",
-  Venus: "/textures/2k_venus.jpg",
-  Earth: "/textures/2k_earth_daymap.jpg",
-  Mars: "/textures/2k_mars.jpg",
-  Jupiter: "/textures/2k_jupiter.jpg",
-  Saturn: "/textures/saturn.jpg",
-  Uranus: "/textures/uranus.jpg",
-  Neptune: "/textures/neptune.jpg",
-};
-
-export const PLANET_INFOS: Record<string, { title: string; desc: string }> = {
-  Mercury: { title: "Mercury", desc: "Mercury is the closest planet to the Sun and also the smallest in our solar system. It has no atmosphere to retain heat, causing extreme temperature differences between day and night — from over 400°C during the day to -180°C at night. A year on Mercury is just 88 Earth days long." },
-  Venus: { title: "Venus", desc: "Venus is similar in size to Earth but wrapped in a thick, toxic atmosphere of carbon dioxide. Surface temperatures reach around 470°C, hotter than Mercury due to the greenhouse effect. Its clouds are made of sulfuric acid, and it spins in the opposite direction compared to most planets." },
-  Earth: { title: "Earth", desc: "Earth is the only planet known to support life. It has a balanced climate, liquid water, and a protective atmosphere composed mainly of nitrogen and oxygen. Earth’s magnetic field shields us from harmful solar radiation, and its moon plays a key role in tides and planetary stability." },
-  Mars: { title: "Mars", desc: "Mars is a cold desert world known as the “Red Planet” due to its iron-rich soil. It has the tallest volcano in the solar system, Olympus Mons, and deep canyons like Valles Marineris. Scientists believe Mars once had water, and exploration continues for signs of ancient life." },
-  Jupiter: { title: "Jupiter", desc: "Jupiter is the largest planet in our solar system — a massive gas giant with over 90 known moons. Its atmosphere is made mostly of hydrogen and helium. The Great Red Spot is a giant storm that has been raging for hundreds of years. Some of its moons, like Europa, may have subsurface oceans." },
-  Saturn: { title: "Saturn", desc: "Saturn is famous for its spectacular ring system made of ice and rock. It’s a gas giant like Jupiter, with over 140 moons, including Titan, which has a thick atmosphere. Saturn is less dense than water — if there were a big enough ocean, it could float!" },
-  Uranus: { title: "Uranus", desc: "Uranus is an ice giant with a pale blue color caused by methane in its upper atmosphere. It rotates on its side, making its seasons extreme and unusual. Temperatures on Uranus can drop to -224°C — making it one of the coldest places in the solar system." },
-  Neptune: { title: "Neptune", desc: "Neptune is the farthest planet from the Sun. It has a deep blue color and is known for its fierce winds — the fastest recorded in the solar system, reaching up to 2,100 km/h. Neptune has 14 known moons and faint rings, and its largest moon, Triton, orbits in the opposite direction." },
-};
+import { PLANETS, PLANET_TEXTURES } from './planetData';
 
 function Sun({ visible = true }) {
   const sunTexture = useTexture("/textures/2k_sun.jpg");
@@ -292,47 +271,7 @@ export default function SolarSystem() {
     planetAngles.current[name] = angle;
   };
 
-  const planets = [
-    { name: "Mercury", radius: 0.4, distance: 12, speed: 0.006, moons: [] },
-    { name: "Venus", radius: 0.8, distance: 17, speed: 0.004, moons: [] },
-    {
-      name: "Earth",
-      radius: 0.9,
-      distance: 22,
-      speed: 0.002,
-      moons: [{ name: "Moon", radius: 0.25, distance: 3, speed: 0.009 }],
-    },
-    {
-      name: "Mars",
-      radius: 0.6,
-      distance: 28,
-      speed: 0.0009,
-      moons: [
-        { name: "Phobos", radius: 0.1, distance: 2, speed: 0.008 },
-        { name: "Deimos", radius: 0.2, distance: 3, speed: 0.007 },
-      ],
-    },
-    { name: "Jupiter", radius: 1.9, distance: 38, speed: 0.0007, moons: [], tilt: Math.PI / 8 },
-    {
-      name: "Saturn",
-      radius: 1.7,
-      distance: 45,
-      speed: 0.0005,
-      moons: [],
-      tilt: Math.PI / 6,
-      ring: { innerRadius: 0.5, outerRadius: 2.5 },
-    },
-    {
-      name: "Uranus",
-      radius: 1.4,
-      distance: 55,
-      speed: 0.0002,
-      moons: [],
-      tilt: Math.PI / 6,
-      ring: { innerRadius: 0, outerRadius: 2 },
-    },
-    { name: "Neptune", radius: 1.3, distance: 63, speed: 0.00008, moons: [], tilt: Math.PI / 8 },
-  ];
+  const planets = PLANETS;
 
   useEffect(() => {
     if (audioRef.current) {

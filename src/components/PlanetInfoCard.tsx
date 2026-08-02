@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './PlanetInfoCard.module.css';
-import { PLANET_INFOS } from './SolarSystem';
+import { PLANET_INFOS } from './planetData';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronUp } from '@fortawesome/free-solid-svg-icons';
 
