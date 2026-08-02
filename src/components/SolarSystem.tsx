@@ -49,11 +49,18 @@ function Background() {
   );
 }
 
-function CameraController({ selectedPlanet, planets, resetCamera, setResetCamera }: any) {
+function CameraController({ selectedPlanet, planets, resetCamera, setResetCamera, savedView }: any) {
   const { camera } = useThree();
-  const defaultPosition = new THREE.Vector3(0, 5, 100);
+  const prevSelected = useRef<string | null>(null);
 
   useFrame(() => {
+    // the frame a planet becomes focused, remember where the user left the
+    // map so closing the card returns them there instead of the home view
+    if (selectedPlanet && !prevSelected.current) {
+      savedView.current.copy(camera.position);
+    }
+    prevSelected.current = selectedPlanet;
+
     if (selectedPlanet) {
       const planet = planets.find((p: any) => p.name === selectedPlanet);
       if (planet) {
@@ -66,9 +73,9 @@ function CameraController({ selectedPlanet, planets, resetCamera, setResetCamera
         camera.lookAt(x, y, z);
       }
     } else if (resetCamera) {
-      camera.position.lerp(defaultPosition, 0.1);
+      camera.position.lerp(savedView.current, 0.1);
       camera.lookAt(0, 0, 0);
-      if (camera.position.distanceTo(defaultPosition) < 0.2) {
+      if (camera.position.distanceTo(savedView.current) < 0.2) {
         setResetCamera(false);
       }
     }
@@ -138,6 +145,7 @@ export default function SolarSystem() {
   };
 
   const planetAngles = useRef<{ [name: string]: number }>({});
+  const savedView = useRef(new THREE.Vector3(0, 5, 100));
 
   const handlePlanetAngle = (name: string, angle: number) => {
     planetAngles.current[name] = angle;
@@ -222,6 +230,7 @@ export default function SolarSystem() {
           planets={PLANETS}
           resetCamera={resetCamera}
           setResetCamera={setResetCamera}
+          savedView={savedView}
         />
         <GroupController selectedPlanet={selectedPlanet} planetAngles={planetAngles} groupRef={groupRef} />
         <OrbitControls
