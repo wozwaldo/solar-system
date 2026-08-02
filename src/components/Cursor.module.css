@@ -1,0 +1,26 @@
+.orb, .trail {
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 10000;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.orb {
+  width: 14px; height: 14px;
+  margin: -7px;
+  background: conic-gradient(from 0deg, var(--lilac), var(--rose), var(--ice), var(--lilac));
+  box-shadow: 0 0 12px rgba(199, 184, 255, 0.7);
+  transition: width 250ms ease, height 250ms ease, margin 250ms ease;
+}
+
+.orb.hot { width: 30px; height: 30px; margin: -15px; }
+.orb.drag { width: 6px; height: 6px; margin: -3px; box-shadow: none; }
+
+.trail {
+  width: 30px; height: 30px;
+  margin: -15px;
+  border: 1px solid rgba(255, 184, 209, 0.45);
+  transition: opacity 200ms ease;
+}

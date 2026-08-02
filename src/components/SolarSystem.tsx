@@ -8,6 +8,8 @@ import * as THREE from "three";
 import { vertexShader, fragmentShader } from "../shaders/spaceShader";
 import PlanetInfoCard from './PlanetInfoCard';
 import Hud from './Hud';
+import Cursor from './Cursor';
+import { cursorState } from './cursorState';
 import { PLANETS } from './planetData';
 import Sun from './Sun';
 import Planet from './Planet';
@@ -129,6 +131,7 @@ export default function SolarSystem() {
   const handlePlanetHover = (name: string | null) => {
     document.body.style.cursor = name ? "pointer" : "default";
     setHoveredPlanet(name);
+    cursorState.hover = name !== null;
   };
 
   useEffect(() => {
@@ -144,6 +147,7 @@ export default function SolarSystem() {
 
   return (
     <div style={{ position: 'fixed', inset: 0, width: '100vw', height: '100vh', background: 'black' }}>
+      <Cursor />
       {/* Music player (hidden) */}
       <audio
         ref={audioRef}
@@ -181,6 +185,8 @@ export default function SolarSystem() {
           enableDamping
           minDistance={20}
           maxDistance={200}
+          onStart={() => { cursorState.drag = true; }}
+          onEnd={() => { cursorState.drag = false; }}
         />
         <EffectComposer>
           <Bloom luminanceThreshold={0.9} luminanceSmoothing={0.6} intensity={0.9} mipmapBlur />
