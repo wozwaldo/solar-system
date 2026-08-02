@@ -92,6 +92,8 @@
   font-weight: 300;
   line-height: 1.75;
   color: var(--muted);
+  /* left panel has no background — keep the paragraph readable over stars */
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.75);
 }
 
 .close {

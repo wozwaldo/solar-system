@@ -64,7 +64,7 @@ const PlanetInfoCard: React.FC<PlanetInfoCardProps> = ({ planet, onClose }) => {
   return (
     <>
       {/* identity + story, floating left of the planet */}
-      <aside className={`${styles.left} ${styles.panel}`} key={`left-${planet}`}>
+      <aside className={styles.left} key={`left-${planet}`}>
         <div className={styles.eyebrow}>
           <DecodeText text={`Planet · ${info.numeral}`} framesPerChar={3} />
         </div>
