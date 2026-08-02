@@ -1,0 +1,36 @@
+/* src/components/Hud.module.css */
+.topRight { position: fixed; top: 24px; right: 24px; z-index: 20; }
+.topLeft  { position: fixed; top: 24px; left: 24px;  z-index: 20; animation: fade 400ms ease both; }
+
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+.holoRing {
+  padding: 1px;
+  border-radius: 999px;
+  background: conic-gradient(from 0deg, var(--lilac), var(--rose), var(--ice), var(--lilac));
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 16px;
+  background: rgba(13, 11, 18, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--pearl);
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 300ms ease;
+}
+
+.pill:hover, .pill:focus-visible { background: rgba(199, 184, 255, 0.16); outline: none; }
+.pill:focus-visible { box-shadow: 0 0 0 2px rgba(168, 228, 255, 0.5); }
+
+@media (prefers-reduced-motion: reduce) { .topLeft { animation: none; } }

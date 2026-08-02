@@ -7,9 +7,7 @@ import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from "three";
 import { vertexShader, fragmentShader } from "../shaders/spaceShader";
 import PlanetInfoCard from './PlanetInfoCard';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faVolumeUp, faVolumeMute } from '@fortawesome/free-solid-svg-icons';
-import styles from './SolarSystem.module.css';
+import Hud from './Hud';
 import { PLANETS } from './planetData';
 import Sun from './Sun';
 import Planet from './Planet';
@@ -114,6 +112,14 @@ export default function SolarSystem() {
     setSelectedPlanet(planetName);
   }
 
+  const handleClose = () => {
+    cardCloseSound.currentTime = 0;
+    cardCloseSound.play();
+
+    setSelectedPlanet(null);
+    setResetCamera(true);
+  };
+
   const planetAngles = useRef<{ [name: string]: number }>({});
 
   const handlePlanetAngle = (name: string, angle: number) => {
@@ -147,27 +153,16 @@ export default function SolarSystem() {
         style={{ display: "none" }}
       />
 
-      {/* Mute/Unmute butonu */}
-      <button
-        onClick={() => setMuted((m) => !m)}
-        className={styles.muteButton}
-        aria-label={muted ? "Unmute" : "Mute"}
-      >
-        {muted
-          ? <FontAwesomeIcon icon={faVolumeMute} />
-          : <FontAwesomeIcon icon={faVolumeUp} />
-        }
-      </button>
+      <Hud
+        muted={muted}
+        onToggleMute={() => setMuted((m) => !m)}
+        showReturn={!!selectedPlanet}
+        onReturn={handleClose}
+      />
 
       <PlanetInfoCard
         planet={selectedPlanet}
-        onClose={() => {
-          cardCloseSound.currentTime = 0;
-          cardCloseSound.play();
-          
-          setSelectedPlanet(null);
-          setResetCamera(true);
-        }}
+        onClose={handleClose}
       />
       <Canvas
         shadows
