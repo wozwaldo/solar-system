@@ -1,0 +1,10 @@
+:root {
+  --void: #0d0b12;
+  --pearl: #efeaf5;
+  --lilac: #c7b8ff;
+  --rose: #ffb8d1;
+  --ice: #a8e4ff;
+  --muted: #b5acc7;
+  --font-display: "Raleway", "Helvetica Neue", -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", Menlo, monospace;
+}
