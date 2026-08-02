@@ -12,8 +12,6 @@ uniform float iTime;
 uniform vec2 iResolution;
 varying vec3 vWorldPosition;
 
-const float PI = 3.141592;
-
 // Random function from original shader
 float hash(vec3 p) {
     p = fract(p * vec3(.1031, .11369, .13787));
@@ -24,26 +22,6 @@ float hash(vec3 p) {
 // Star layer function from original shader
 float calcStarLayer(vec3 d, float intensity) {
     return smoothstep(intensity, 0., length(fract(d) - 0.5)) * smoothstep(0.98, 1., hash(floor(d)));
-}
-
-// Falling star function from original shader
-float fallingStar(vec3 p, vec3 a, vec3 b) {
-    p -= a;
-    b -= a;
-    float h = clamp(dot(p, b) / dot(b, b), 0., 1.);
-    p -= b * h;
-    return h * smoothstep(2. * h / iResolution.y, 0., length(p));
-}
-
-// Rotation matrix for falling stars
-mat3 rotMat(float k) {
-    float c = cos(k);
-    float s = sin(k);
-    return mat3(
-        c, -s, 0,
-        s, c, 0,
-        0, 0, 1
-    );
 }
 
 // Noise function for nebula
@@ -81,49 +59,49 @@ float fbm(vec3 p) {
 }
 
 void main() {
-    // Get the direction from center
     vec3 pos = normalize(vWorldPosition);
-    
-    // Create a ray direction for star calculations
     vec3 rayDir = pos;
-    
-    // Base background color (same as original)
-    vec3 bgColor = vec3(0.01, 0.01, 0.02);
-    
-    // Add falling stars (adapted for 3D)
-    vec3 fallingStarDir = rayDir * rotMat(PI);
-    vec3 fallingStarStart = vec3(-0.04, 0.0, 0.0) + vec3(tan(iTime / 4.), 0.0, 0.0);
-    vec3 fallingStarEnd = vec3(0.04, 0.0, 0.0) + vec3(tan(iTime / 4.), 0.0, 0.0);
-    vec3 fallingStarColor = fallingStar(fallingStarDir, fallingStarStart, fallingStarEnd) * vec3(0.3, 0.4, 0.7);
-    
-    // Add star layers (same as original)
+
+    // deep violet-black base (matches --void #0D0B12)
+    vec3 bgColor = vec3(0.051, 0.043, 0.071) * 0.55;
+
+    // star layers, pearl-tinted, gentle twinkle
+    vec3 pearl = vec3(0.937, 0.918, 0.961);
     vec3 starColor = vec3(0.0);
-    starColor += vec3(calcStarLayer(rayDir * 550., abs(sin(iTime / 2.)) / 2.)) * vec3(0.5, 0.28, 0.73);
-    starColor += vec3(calcStarLayer(rayDir * 500., abs(cos(iTime / 2.)) / 2.)) * vec3(0.3, 0.6, 0.73);
-    starColor += vec3(calcStarLayer(rayDir * 400., abs(cos(iTime)) / 2.)) * vec3(0.5, 0.58, 0.43);
-    starColor += vec3(calcStarLayer(rayDir * 500., abs(sin(iTime)) / 2.)) * vec3(0.2, 0.2, 0.8);
-    
-    // Add the bright spot from original shader
-    vec3 brightSpot = vec3(0.09 / length(pos - vec3(0, 0.07, 0))) * vec3(0.7, 0.5, 0.);
-    
-    // Add nebula effect
-    vec3 nebulaPos = pos * 2.0 + vec3(iTime * 0.005); // Slow rotation
-    float nebulaNoise = fbm(nebulaPos);
-    
-    // Create colorful nebula gradients with cool tones
-    vec3 nebulaColor = vec3(0.0);
-    nebulaColor += vec3(0.2, 0.3, 0.8) * smoothstep(0.3, 0.7, fbm(nebulaPos * 1.5)); // Deep blue
-    nebulaColor += vec3(0.4, 0.2, 0.9) * smoothstep(0.4, 0.6, fbm(nebulaPos * 2.0)); // Purple
-    nebulaColor += vec3(0.3, 0.5, 0.9) * smoothstep(0.2, 0.8, fbm(nebulaPos * 1.0)); // Light blue
-    nebulaColor += vec3(0.2, 0.8, 0.3) * smoothstep(0.5, 0.9, fbm(nebulaPos * 1.7)); // Green
-    
-    // Blend nebula with base color (reduced opacity)
-    float nebulaIntensity = smoothstep(0.2, 0.8, nebulaNoise) * 0.05; // Reduced from 0.3 to 0.15
-    vec3 finalNebula = nebulaColor * nebulaIntensity;
-    
-    // Combine everything
-    vec3 finalColor = bgColor + fallingStarColor + starColor + brightSpot + finalNebula;
-    
-    gl_FragColor = vec4(finalColor, 1.0);
+    starColor += calcStarLayer(rayDir * 620., 0.35) * pearl * 0.9;              // fine far layer
+    starColor += calcStarLayer(rayDir * 340., 0.30) * pearl;                    // mid layer
+    starColor += calcStarLayer(rayDir * 180., 0.22 + 0.05 * sin(iTime * 0.8)) * pearl * 1.4; // near, brightest
+    // subtle chromatic accents on a sparse layer
+    starColor += calcStarLayer(rayDir * 260., 0.28) * vec3(0.78, 0.72, 1.0) * 0.5; // lilac
+    starColor += calcStarLayer(rayDir * 300., 0.28) * vec3(0.66, 0.89, 1.0) * 0.4; // ice
+
+    // milky way band: brightness concentrated near an inclined great circle
+    vec3 bandNormal = normalize(vec3(0.35, 1.0, 0.15));
+    float band = 1.0 - abs(dot(pos, bandNormal));
+    float bandMask = smoothstep(0.75, 1.0, band);
+    float bandNoise = fbm(pos * 6.0);
+    vec3 milkyWay = pearl * bandMask * bandNoise * 0.10
+                  + vec3(0.78, 0.72, 1.0) * bandMask * fbm(pos * 3.0) * 0.05;
+
+    // aurora veils: slow-drifting fbm in palette colors, very low intensity
+    vec3 ap = pos * 2.0 + vec3(iTime * 0.004, 0.0, iTime * 0.002);
+    vec3 aurora = vec3(0.0);
+    aurora += vec3(0.78, 0.72, 1.0) * smoothstep(0.55, 0.85, fbm(ap * 1.3));         // lilac
+    aurora += vec3(1.0, 0.72, 0.82) * smoothstep(0.60, 0.90, fbm(ap * 1.7 + 4.2));   // rose
+    aurora += vec3(0.66, 0.89, 1.0) * smoothstep(0.55, 0.85, fbm(ap * 1.1 + 9.1));   // ice
+    aurora *= 0.035;
+
+    // occasional slow shooting star: one streak sweeping a band every ~14s
+    float cycle = fract(iTime / 14.0);
+    float streakPos = mix(-1.2, 1.2, cycle);
+    vec3 streakDir = normalize(vec3(1.0, 0.35, 0.2));
+    float along = dot(pos, streakDir);
+    float across = length(pos - streakDir * along);
+    float streak = smoothstep(0.012, 0.0, abs(along - streakPos) - 0.04)
+                 * smoothstep(0.03, 0.0, across - 0.001)
+                 * smoothstep(0.0, 0.1, cycle) * smoothstep(1.0, 0.9, cycle);
+    vec3 shooting = pearl * streak * 0.6;
+
+    gl_FragColor = vec4(bgColor + starColor + milkyWay + aurora + shooting, 1.0);
 }
-`; 
+`;
