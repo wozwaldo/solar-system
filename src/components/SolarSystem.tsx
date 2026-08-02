@@ -2,118 +2,17 @@
 
 import { useRef, useMemo, Fragment, useState, useEffect } from "react";
 import { useFrame, Canvas, useThree } from "@react-three/fiber";
-import { OrbitControls, useTexture } from "@react-three/drei";
-import { EffectComposer, Bloom, Select } from '@react-three/postprocessing';
+import { OrbitControls } from "@react-three/drei";
+import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from "three";
 import { vertexShader, fragmentShader } from "../shaders/spaceShader";
 import PlanetInfoCard from './PlanetInfoCard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faVolumeUp, faVolumeMute } from '@fortawesome/free-solid-svg-icons';
 import styles from './SolarSystem.module.css';
-import { PLANETS, PLANET_TEXTURES } from './planetData';
-
-function Sun({ visible = true }) {
-  const sunTexture = useTexture("/textures/2k_sun.jpg");
-  sunTexture.colorSpace = THREE.SRGBColorSpace;
-
-  const sunRef = useRef<THREE.Mesh>(null);
-  const BLOOM_LAYER = 1;
-
-  useFrame((state, delta) => {
-    if (sunRef.current) {
-      sunRef.current.rotation.y += 0.001; 
-      sunRef.current.layers.set(BLOOM_LAYER);
-    }
-  });
-
-  return (
-    <Select enabled>
-      <mesh ref={sunRef} scale={7} visible={visible}>
-        <sphereGeometry args={[1, 32, 32]} />
-        <meshBasicMaterial map={sunTexture} toneMapped={false} />
-      </mesh>
-    </Select>
-  );
-}
-
-function Planet({ name, radius, distance, speed, tilt, ring, moons, onPlanetClick, onAngleUpdate, spinning, onPointerOver, onPointerOut, visible = true }: any) {
-  const texture = useTexture(PLANET_TEXTURES[name]);
-  texture.colorSpace = THREE.SRGBColorSpace;
-
-  const moonTexture = useTexture("/textures/2k_moon.jpg");
-  moonTexture.colorSpace = THREE.SRGBColorSpace;
-
-  const ref = useRef<THREE.Mesh>(null);
-  const moonRefs = useRef<THREE.Mesh[]>([]);
-  const selfRotation = useRef(0);
-
-  useFrame((state, delta) => {
-    if (ref.current) {
-      ref.current.rotation.y += speed;
-      ref.current.position.x = Math.sin(ref.current.rotation.y) * distance;
-      ref.current.position.z = Math.cos(ref.current.rotation.y) * distance;
-      if (onAngleUpdate) onAngleUpdate(name, ref.current.rotation.y);
-
-      if (spinning) {
-        selfRotation.current += 0.0005;
-      }
-      ref.current.rotation.z = selfRotation.current;
-    }
-
-    moons?.forEach((moon: any, i: number) => {
-      const moonMesh = moonRefs.current[i];
-      if (moonMesh) {
-        moonMesh.rotation.y += moon.speed;
-        moonMesh.position.x = Math.sin(moonMesh.rotation.y) * moon.distance;
-        moonMesh.position.z = Math.cos(moonMesh.rotation.y) * moon.distance;
-      }
-    });
-  });
-
-  return (
-    <mesh
-      ref={ref}
-      rotation={[tilt || 0, 0, 0]}
-      onClick={() => onPlanetClick?.(name)}
-      onPointerOver={(e) => {
-        document.body.style.cursor = "pointer";
-        onPointerOver && onPointerOver(e);
-      }}
-      onPointerOut={(e) => {
-        document.body.style.cursor = "default";
-        onPointerOut && onPointerOut(e);
-      }}
-      visible={visible}
-    >
-      <sphereGeometry args={[radius, 32, 32]} />
-      <meshStandardMaterial map={texture} />
-      {ring && <PlanetRing name={name} ring={ring} />}
-      {moons?.map((moon: any, i: number) => (
-        <mesh key={moon.name} ref={(el) => (moonRefs.current[i] = el as THREE.Mesh)}>
-          <sphereGeometry args={[moon.radius, 32, 32]} />
-          <meshStandardMaterial map={moonTexture} />
-        </mesh>
-      ))}
-    </mesh>
-  );
-}
-
-function PlanetRing({ name, ring }: any) {
-  const ringTexture = useTexture(`/textures/${name.toLowerCase()}_ring.png`);
-  ringTexture.colorSpace = THREE.SRGBColorSpace;
-
-  return (
-    <mesh rotation={[Math.PI / 3, 0, 0]}>
-      <ringGeometry args={[ring.innerRadius, ring.outerRadius, 64]} />
-      <meshStandardMaterial
-        map={ringTexture}
-        side={THREE.DoubleSide}
-        transparent
-        opacity={0.8}
-      />
-    </mesh>
-  );
-}
+import { PLANETS } from './planetData';
+import Sun from './Sun';
+import Planet from './Planet';
 
 function Background() {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -212,31 +111,6 @@ function GroupController({ selectedPlanet, planetAngles, groupRef }: any) {
   return null;
 }
 
-function CameraLight({ enabled }: { enabled: boolean }) {
-  const { camera } = useThree();
-  const lightRef = useRef<THREE.PointLight>(null);
-
-  // Kameranın pozisyonunu takip et
-  useFrame(() => {
-    if (lightRef.current && enabled) {
-      lightRef.current.position.copy(camera.position);
-    }
-  });
-
-  // Sadece seçili gezegen varken ışığı göster
-  if (!enabled) return null;
-
-  return (
-    <pointLight
-      ref={lightRef}
-      intensity={100}
-      distance={1000}
-      color="white"
-      castShadow={false}
-    />
-  );
-}
-
 export default function SolarSystem() {
   const [hoveredPlanet, setHoveredPlanet] = useState<string | null>(null);
   const [selectedPlanet, setSelectedPlanet] = useState<string | null>(null);
@@ -271,7 +145,10 @@ export default function SolarSystem() {
     planetAngles.current[name] = angle;
   };
 
-  const planets = PLANETS;
+  const handlePlanetHover = (name: string | null) => {
+    document.body.style.cursor = name ? "pointer" : "default";
+    setHoveredPlanet(name);
+  };
 
   useEffect(() => {
     if (audioRef.current) {
@@ -318,14 +195,14 @@ export default function SolarSystem() {
         }}
       />
       <Canvas
+        shadows
         camera={{ position: [0, 5, 100], fov: 35 }}
         style={{ width: '100vw', height: '100vh', display: 'block', background: 'black' }}
         gl={{ preserveDrawingBuffer: true }}
-        onCreated={({ camera }) => camera.layers.enable(1)}
       >
         <CameraController
           selectedPlanet={selectedPlanet}
-          planets={planets}
+          planets={PLANETS}
           resetCamera={resetCamera}
           setResetCamera={setResetCamera}
         />
@@ -335,31 +212,27 @@ export default function SolarSystem() {
           minDistance={20}
           maxDistance={200}
         />
-        <CameraLight enabled={!!selectedPlanet} />
-        {/*
         <EffectComposer>
-          <Bloom luminanceThreshold={0.1} luminanceSmoothing={0.9} intensity={1.5} />
+          <Bloom luminanceThreshold={0.9} luminanceSmoothing={0.6} intensity={0.9} mipmapBlur />
         </EffectComposer>
-        */}
-        <ambientLight intensity={0.2} color={0xbdb7ee} />
-        <pointLight intensity={3000} color={0xfffaa7d} />
+        <ambientLight intensity={0.07} color={"#c7b8ff"} />
         <Background />
         <group ref={groupRef}>
           <Sun visible={!selectedPlanet} />
-          {planets.map((planet) => (
+          {PLANETS.map((planet) => (
             <Fragment key={planet.name}>
-              <Orbit 
-                radius={planet.distance} 
+              <Orbit
+                radius={planet.distance}
                 isHovered={hoveredPlanet === planet.name}
                 visible={!selectedPlanet || selectedPlanet === planet.name}
               />
               <Planet
-                {...planet}
-                onPlanetClick={handlePlanetClick}
+                data={planet}
+                selected={selectedPlanet === planet.name}
+                hovered={hoveredPlanet === planet.name}
+                onClick={handlePlanetClick}
                 onAngleUpdate={handlePlanetAngle}
-                spinning={selectedPlanet === planet.name}
-                onPointerOver={() => setHoveredPlanet(planet.name)}
-                onPointerOut={() => setHoveredPlanet(null)}
+                onHover={handlePlanetHover}
                 visible={!selectedPlanet || selectedPlanet === planet.name}
               />
             </Fragment>
