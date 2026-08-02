@@ -215,7 +215,7 @@ export default function SolarSystem() {
           onEnd={() => { cursorState.drag = false; }}
         />
         <EffectComposer>
-          <Bloom luminanceThreshold={0.9} luminanceSmoothing={0.6} intensity={0.9} mipmapBlur />
+          <Bloom luminanceThreshold={0.9} luminanceSmoothing={0.6} intensity={1.15} mipmapBlur />
         </EffectComposer>
         <ambientLight intensity={0.07} color={"#c7b8ff"} />
         <FocusLight enabled={!!selectedPlanet} />

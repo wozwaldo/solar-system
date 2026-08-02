@@ -3,8 +3,9 @@ import { useFrame } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
 
-// soft radial glow — brightest at center, eased falloff to fully transparent,
-// so the halo reads as radiated light with no visible outer edge
+// faint warm haze with a smooth exponential falloff (many tiny gradient stops
+// so there is no visible banding or edge) — the main glow comes from bloom on
+// the overbright sun core, this only adds a soft atmosphere around it
 function makeGlowTexture() {
   const size = 256;
   const canvas = document.createElement("canvas");
@@ -12,11 +13,14 @@ function makeGlowTexture() {
   canvas.height = size;
   const ctx = canvas.getContext("2d")!;
   const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-  g.addColorStop(0.0, "rgba(255, 244, 214, 0.95)");
-  g.addColorStop(0.18, "rgba(255, 214, 140, 0.55)");
-  g.addColorStop(0.38, "rgba(255, 166, 92, 0.22)");
-  g.addColorStop(0.62, "rgba(255, 140, 80, 0.07)");
-  g.addColorStop(1.0, "rgba(255, 120, 70, 0)");
+  for (let i = 0; i <= 24; i++) {
+    const t = i / 24;
+    const alpha = 0.5 * Math.pow(1 - t, 3.2);
+    const r = 255;
+    const gr = Math.round(230 - 90 * t);
+    const b = Math.round(190 - 120 * t);
+    g.addColorStop(t, `rgba(${r}, ${gr}, ${b}, ${alpha})`);
+  }
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, size, size);
   const texture = new THREE.CanvasTexture(canvas);
@@ -39,15 +43,18 @@ export default function Sun({ visible }: { visible: boolean }) {
       <group visible={visible}>
         <mesh ref={coreRef} scale={7}>
           <sphereGeometry args={[1, 64, 64]} />
-          <meshBasicMaterial map={sunTexture} toneMapped={false} />
+          {/* overbright color multiplier pushes the core past the bloom
+              threshold, so the glow is real light-spill from the renderer */}
+          <meshBasicMaterial map={sunTexture} color={[2.4, 2.0, 1.5] as any} toneMapped={false} />
         </mesh>
-        <sprite scale={[30, 30, 1]}>
+        <sprite scale={[22, 22, 1]}>
           <spriteMaterial
             map={glowTexture}
             transparent
             depthWrite={false}
             blending={THREE.AdditiveBlending}
             toneMapped={false}
+            opacity={0.55}
           />
         </sprite>
       </group>
