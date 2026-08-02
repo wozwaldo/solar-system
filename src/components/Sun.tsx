@@ -1,31 +1,34 @@
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
 
-const coronaVertex = `
-varying vec3 vNormal;
-varying vec3 vViewDir;
-void main() {
-  vNormal = normalize(normalMatrix * normal);
-  vec4 mv = modelViewMatrix * vec4(position, 1.0);
-  vViewDir = normalize(-mv.xyz);
-  gl_Position = projectionMatrix * mv;
-}`;
-
-const coronaFragment = `
-varying vec3 vNormal;
-varying vec3 vViewDir;
-void main() {
-  float rim = pow(1.0 - abs(dot(vNormal, vViewDir)), 2.0);
-  vec3 warm = mix(vec3(1.0, 0.85, 0.6), vec3(1.0, 0.55, 0.35), rim);
-  gl_FragColor = vec4(warm, rim * 0.9);
-}`;
+// soft radial glow — brightest at center, eased falloff to fully transparent,
+// so the halo reads as radiated light with no visible outer edge
+function makeGlowTexture() {
+  const size = 256;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d")!;
+  const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  g.addColorStop(0.0, "rgba(255, 244, 214, 0.95)");
+  g.addColorStop(0.18, "rgba(255, 214, 140, 0.55)");
+  g.addColorStop(0.38, "rgba(255, 166, 92, 0.22)");
+  g.addColorStop(0.62, "rgba(255, 140, 80, 0.07)");
+  g.addColorStop(1.0, "rgba(255, 120, 70, 0)");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, size, size);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
 
 export default function Sun({ visible }: { visible: boolean }) {
   const sunTexture = useTexture("/textures/2k_sun.jpg");
   sunTexture.colorSpace = THREE.SRGBColorSpace;
   const coreRef = useRef<THREE.Mesh>(null);
+  const glowTexture = useMemo(makeGlowTexture, []);
 
   useFrame(() => {
     if (coreRef.current) coreRef.current.rotation.y += 0.0008;
@@ -38,17 +41,15 @@ export default function Sun({ visible }: { visible: boolean }) {
           <sphereGeometry args={[1, 64, 64]} />
           <meshBasicMaterial map={sunTexture} toneMapped={false} />
         </mesh>
-        <mesh scale={8.4}>
-          <sphereGeometry args={[1, 64, 64]} />
-          <shaderMaterial
-            vertexShader={coronaVertex}
-            fragmentShader={coronaFragment}
+        <sprite scale={[30, 30, 1]}>
+          <spriteMaterial
+            map={glowTexture}
             transparent
             depthWrite={false}
             blending={THREE.AdditiveBlending}
-            side={THREE.BackSide}
+            toneMapped={false}
           />
-        </mesh>
+        </sprite>
       </group>
       {/* the scene's light source: always active, independent of sun visuals */}
       <pointLight intensity={4000} distance={0} decay={2} color={"#fff2d9"}

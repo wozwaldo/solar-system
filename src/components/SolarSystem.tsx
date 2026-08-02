@@ -75,6 +75,21 @@ function CameraController({ selectedPlanet, planets, resetCamera, setResetCamera
   return null;
 }
 
+// when a planet is focused, the camera faces its night side (the sun is behind
+// the planet) — this fill light follows the camera so the focused planet reads
+function FocusLight({ enabled }: { enabled: boolean }) {
+  const { camera } = useThree();
+  const lightRef = useRef<THREE.PointLight>(null);
+
+  useFrame(() => {
+    if (lightRef.current) lightRef.current.position.copy(camera.position);
+  });
+
+  if (!enabled) return null;
+
+  return <pointLight ref={lightRef} intensity={320} decay={2} color={"#fff6e8"} />;
+}
+
 function GroupController({ selectedPlanet, planetAngles, groupRef }: any) {
   useFrame(() => {
     if (selectedPlanet && groupRef.current) {
@@ -143,6 +158,35 @@ export default function SolarSystem() {
     }
   }, [muted]);
 
+  const mutedRef = useRef(muted);
+  useEffect(() => {
+    mutedRef.current = muted;
+  }, [muted]);
+
+  // browsers block autoplay until a user gesture: try immediately (works if the
+  // site already has autoplay permission), otherwise start on the first
+  // pointer/key interaction anywhere on the page
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    let cleanedUp = false;
+    const startOnGesture = () => {
+      if (!mutedRef.current) audio.play().catch(() => {});
+      cleanup();
+    };
+    const cleanup = () => {
+      if (cleanedUp) return;
+      cleanedUp = true;
+      window.removeEventListener("pointerdown", startOnGesture);
+      window.removeEventListener("keydown", startOnGesture);
+    };
+    audio.play().catch(() => {
+      window.addEventListener("pointerdown", startOnGesture);
+      window.addEventListener("keydown", startOnGesture);
+    });
+    return cleanup;
+  }, []);
+
   return (
     <div style={{ position: 'fixed', inset: 0, width: '100vw', height: '100vh', background: 'black' }}>
       <Cursor />
@@ -190,6 +234,7 @@ export default function SolarSystem() {
           <Bloom luminanceThreshold={0.9} luminanceSmoothing={0.6} intensity={0.9} mipmapBlur />
         </EffectComposer>
         <ambientLight intensity={0.07} color={"#c7b8ff"} />
+        <FocusLight enabled={!!selectedPlanet} />
         <Background />
         <group ref={groupRef}>
           <Sun visible={!selectedPlanet} />

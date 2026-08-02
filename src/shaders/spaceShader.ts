@@ -62,25 +62,25 @@ void main() {
     vec3 rayDir = pos;
 
     // deep violet-black base (matches --void #0D0B12)
-    vec3 bgColor = vec3(0.051, 0.043, 0.071) * 0.55;
+    vec3 bgColor = vec3(0.051, 0.043, 0.071) * 0.25;
 
     // star layers, pearl-tinted, gentle twinkle
     vec3 pearl = vec3(0.937, 0.918, 0.961);
     vec3 starColor = vec3(0.0);
-    starColor += calcStarLayer(rayDir * 620., 0.35) * pearl * 0.9;              // fine far layer
-    starColor += calcStarLayer(rayDir * 340., 0.30) * pearl;                    // mid layer
-    starColor += calcStarLayer(rayDir * 180., 0.22 + 0.05 * sin(iTime * 0.8)) * pearl * 1.4; // near, brightest
+    starColor += calcStarLayer(rayDir * 620., 0.35) * pearl * 0.55;             // fine far layer
+    starColor += calcStarLayer(rayDir * 340., 0.30) * pearl * 0.7;              // mid layer
+    starColor += calcStarLayer(rayDir * 180., 0.22 + 0.05 * sin(iTime * 0.8)) * pearl * 0.85; // near, brightest
     // subtle chromatic accents on a sparse layer
-    starColor += calcStarLayer(rayDir * 260., 0.28) * vec3(0.78, 0.72, 1.0) * 0.5; // lilac
-    starColor += calcStarLayer(rayDir * 300., 0.28) * vec3(0.66, 0.89, 1.0) * 0.4; // ice
+    starColor += calcStarLayer(rayDir * 260., 0.28) * vec3(0.78, 0.72, 1.0) * 0.35; // lilac
+    starColor += calcStarLayer(rayDir * 300., 0.28) * vec3(0.66, 0.89, 1.0) * 0.28; // ice
 
     // milky way band: brightness concentrated near an inclined great circle
     vec3 bandNormal = normalize(vec3(0.35, 1.0, 0.15));
     float band = 1.0 - abs(dot(pos, bandNormal));
     float bandMask = smoothstep(0.75, 1.0, band);
     float bandNoise = fbm(pos * 6.0);
-    vec3 milkyWay = pearl * bandMask * bandNoise * 0.10
-                  + vec3(0.78, 0.72, 1.0) * bandMask * fbm(pos * 3.0) * 0.05;
+    vec3 milkyWay = pearl * bandMask * bandNoise * 0.05
+                  + vec3(0.78, 0.72, 1.0) * bandMask * fbm(pos * 3.0) * 0.03;
 
     // aurora veils: slow-drifting fbm in palette colors, very low intensity
     vec3 ap = pos * 2.0 + vec3(iTime * 0.004, 0.0, iTime * 0.002);
@@ -88,7 +88,7 @@ void main() {
     aurora += vec3(0.78, 0.72, 1.0) * smoothstep(0.55, 0.85, fbm(ap * 1.3));         // lilac
     aurora += vec3(1.0, 0.72, 0.82) * smoothstep(0.60, 0.90, fbm(ap * 1.7 + 4.2));   // rose
     aurora += vec3(0.66, 0.89, 1.0) * smoothstep(0.55, 0.85, fbm(ap * 1.1 + 9.1));   // ice
-    aurora *= 0.035;
+    aurora *= 0.018;
 
     // occasional slow shooting star: one streak sweeping a band every ~14s
     float cycle = fract(iTime / 14.0);
