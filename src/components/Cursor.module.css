@@ -5,6 +5,7 @@
   z-index: 10000;
   border-radius: 50%;
   will-change: transform;
+  transform: translate(-100px, -100px);
 }
 
 .orb {

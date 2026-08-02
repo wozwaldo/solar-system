@@ -25,7 +25,6 @@ function Background() {
         fragmentShader,
         uniforms: {
           iTime: { value: 0 },
-          iResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
         },
         side: THREE.BackSide,
         depthWrite: false,
@@ -129,7 +128,6 @@ export default function SolarSystem() {
   };
 
   const handlePlanetHover = (name: string | null) => {
-    document.body.style.cursor = name ? "pointer" : "default";
     setHoveredPlanet(name);
     cursorState.hover = name !== null;
   };

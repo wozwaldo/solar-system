@@ -32,25 +32,27 @@ export default function Sun({ visible }: { visible: boolean }) {
   });
 
   return (
-    <group visible={visible}>
-      <mesh ref={coreRef} scale={7}>
-        <sphereGeometry args={[1, 64, 64]} />
-        <meshBasicMaterial map={sunTexture} toneMapped={false} />
-      </mesh>
-      <mesh scale={8.4}>
-        <sphereGeometry args={[1, 64, 64]} />
-        <shaderMaterial
-          vertexShader={coronaVertex}
-          fragmentShader={coronaFragment}
-          transparent
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-          side={THREE.BackSide}
-        />
-      </mesh>
-      {/* the scene's light source */}
+    <>
+      <group visible={visible}>
+        <mesh ref={coreRef} scale={7}>
+          <sphereGeometry args={[1, 64, 64]} />
+          <meshBasicMaterial map={sunTexture} toneMapped={false} />
+        </mesh>
+        <mesh scale={8.4}>
+          <sphereGeometry args={[1, 64, 64]} />
+          <shaderMaterial
+            vertexShader={coronaVertex}
+            fragmentShader={coronaFragment}
+            transparent
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+            side={THREE.BackSide}
+          />
+        </mesh>
+      </group>
+      {/* the scene's light source: always active, independent of sun visuals */}
       <pointLight intensity={4000} distance={0} decay={2} color={"#fff2d9"}
         castShadow shadow-mapSize-width={1024} shadow-mapSize-height={1024} />
-    </group>
+    </>
   );
 }

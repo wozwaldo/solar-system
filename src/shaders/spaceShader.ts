@@ -9,7 +9,6 @@ void main() {
 
 export const fragmentShader = `
 uniform float iTime;
-uniform vec2 iResolution;
 varying vec3 vWorldPosition;
 
 // Random function from original shader
