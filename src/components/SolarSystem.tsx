@@ -13,6 +13,7 @@ import styles from './SolarSystem.module.css';
 import { PLANETS } from './planetData';
 import Sun from './Sun';
 import Planet from './Planet';
+import Orbit from './Orbit';
 
 function Background() {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -44,32 +45,6 @@ function Background() {
     <mesh ref={meshRef} renderOrder={-1}>
       <sphereGeometry args={[1000, 32, 32]} />
       <primitive object={material} />
-    </mesh>
-  );
-}
-
-function Orbit({ radius, isHovered, visible = true }: { radius: number, isHovered: boolean, visible?: boolean }) {
-  const materialRef = useRef<THREE.MeshBasicMaterial>(null);
-  const [color] = useState(() => new THREE.Color("#48434f"));
-
-  useFrame(() => {
-    const target = isHovered ? new THREE.Color("#00ffaa") : new THREE.Color("#48434f");
-    color.lerp(target, 0.01);
-    if (materialRef.current) {
-      materialRef.current.color.copy(color);
-    }
-  });
-
-  return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} visible={visible}>
-      <ringGeometry args={[radius - 0.01, radius + 0.05, 128]} />
-      <meshBasicMaterial
-        ref={materialRef}
-        color={color}
-        transparent
-        opacity={0.5}
-        side={THREE.DoubleSide}
-      />
     </mesh>
   );
 }
@@ -223,7 +198,7 @@ export default function SolarSystem() {
             <Fragment key={planet.name}>
               <Orbit
                 radius={planet.distance}
-                isHovered={hoveredPlanet === planet.name}
+                hovered={hoveredPlanet === planet.name}
                 visible={!selectedPlanet || selectedPlanet === planet.name}
               />
               <Planet

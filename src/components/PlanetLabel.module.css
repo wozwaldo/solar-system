@@ -1,0 +1,15 @@
+.label {
+  font-family: var(--font-display);
+  font-weight: 200;
+  font-size: 14px;
+  letter-spacing: 0.45em;
+  padding-left: 0.45em; /* optical centering for tracked type */
+  text-transform: uppercase;
+  color: var(--pearl);
+  opacity: 0;
+  transition: opacity 400ms ease;
+  white-space: nowrap;
+  text-shadow: 0 0 12px rgba(199, 184, 255, 0.6);
+}
+.visible { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .label { transition: none; } }

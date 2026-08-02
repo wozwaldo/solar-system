@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { PlanetData, PLANET_TEXTURES } from "./planetData";
 import PlanetRing from "./PlanetRing";
 import Atmosphere from "./Atmosphere";
+import PlanetLabel from "./PlanetLabel";
 
 export interface PlanetProps {
   data: PlanetData;
@@ -90,6 +91,11 @@ export default function Planet({ data, visible, selected, hovered, onClick, onAn
           </mesh>
         </group>
       ))}
+      <PlanetLabel
+        name={data.name}
+        visible={hovered}
+        offsetY={data.radius + (data.ring ? data.ring.outerRadius - data.radius : 0) + 1.2}
+      />
     </group>
   );
 }
