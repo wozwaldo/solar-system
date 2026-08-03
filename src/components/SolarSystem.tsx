@@ -68,10 +68,13 @@ function CameraController({ selectedPlanet, planets, resetCamera, setResetCamera
         const x = Math.sin(angle) * planet.distance;
         const y = 0;
         const z = Math.cos(angle) * planet.distance;
-        // frame every planet at a similar apparent size: back off in
-        // proportion to its visual radius (rings included)
-        const visualRadius = planet.ring ? planet.ring.outerRadius : planet.radius;
-        const offset = Math.max(7, visualRadius * 3.6);
+        // frame every planet at a similar apparent size; rings extend
+        // sideways, not toward the camera, so they weigh in less than body radius
+        const offset = Math.max(
+          7,
+          planet.radius * 5.5,
+          planet.ring ? planet.ring.outerRadius * 2.6 : 0
+        );
         const target = new THREE.Vector3(x, y, z + offset);
         camera.position.lerp(target, 0.1);
         camera.lookAt(x, y, z);
