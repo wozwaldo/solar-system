@@ -8,6 +8,7 @@ import * as THREE from "three";
 import { vertexShader, fragmentShader } from "../shaders/spaceShader";
 import PlanetInfoCard from './PlanetInfoCard';
 import Hud from './Hud';
+import LoadingScreen from './LoadingScreen';
 import Cursor from './Cursor';
 import { cursorState } from './cursorState';
 import { playCardOpen, playCardClose } from './uiSounds';
@@ -205,6 +206,8 @@ export default function SolarSystem() {
 
   return (
     <div style={{ position: 'fixed', inset: 0, width: '100vw', height: '100vh', background: 'black' }}>
+      {/* covers the scene until every texture (and font) has loaded */}
+      <LoadingScreen />
       <Cursor />
       {/* Music player (hidden) */}
       <audio

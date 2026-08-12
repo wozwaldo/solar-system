@@ -1,0 +1,122 @@
+/* full-viewport void; sits above the HUD (z 20) while assets stream in */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--void);
+  transition: opacity 700ms ease;
+}
+
+.hidden { opacity: 0; pointer-events: none; }
+
+/* ---- orbit loader: a hairline orbit with one pearl dot around a sun ----
+   the sun dot sits at the exact viewport center so it lines up with the
+   static pre-bundle dot in index.html */
+.orbitLoader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 128px;
+  height: 128px;
+  transform: translate(-50%, -50%);
+}
+
+.tilt {
+  position: absolute;
+  inset: 0;
+  transform: rotateX(64deg);
+  transform-style: preserve-3d;
+}
+
+.ring {
+  position: absolute;
+  inset: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.spin {
+  position: absolute;
+  inset: 14px;
+  animation: spin 3.2s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.orbitDot {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px;
+  border-radius: 50%;
+  background: var(--pearl);
+  box-shadow: 0 0 10px 2px rgba(199, 184, 255, 0.8);
+}
+
+.sunDot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  margin: -4.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff6e8, #ffd9a0 70%);
+  box-shadow: 0 0 18px 5px rgba(255, 214, 160, 0.45);
+}
+
+/* ---- frameless text block below the orbit ---- */
+.text {
+  position: absolute;
+  top: calc(50% + 84px);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  margin: 0 0 22px;
+  font-weight: 200;
+  font-size: clamp(17px, 3.2vw, 24px);
+  letter-spacing: 0.34em;
+  /* letter-spacing trails the last glyph — nudge back to optical center */
+  padding-left: 0.34em;
+  text-transform: uppercase;
+  background: linear-gradient(100deg, var(--pearl) 20%, var(--lilac) 40%, var(--rose) 55%, var(--ice) 70%, var(--pearl) 85%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: pearl 6s ease-in-out infinite alternate;
+}
+
+@keyframes pearl { from { background-position: 0% 0; } to { background-position: 100% 0; } }
+
+.track {
+  width: min(240px, 64vw);
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--lilac), var(--rose), var(--ice));
+  box-shadow: 0 0 12px rgba(199, 184, 255, 0.7);
+}
+
+.readout {
+  margin-top: 14px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay { transition: none; }
+  .spin, .title { animation: none; }
+}
