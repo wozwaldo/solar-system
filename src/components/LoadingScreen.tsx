@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useProgress } from '@react-three/drei';
 import styles from './LoadingScreen.module.css';
-import DecodeText from './DecodeText';
 
 // hold the loader a beat even on fast connections so the decode/orbit moment
 // reads, then fade to reveal the fully-loaded scene
@@ -76,9 +75,7 @@ export default function LoadingScreen() {
         <div className={styles.sunDot} />
       </div>
       <div className={styles.text}>
-        <h1 className={styles.title}>
-          <DecodeText text="SOLAR SYSTEM" framesPerChar={5} />
-        </h1>
+        <h1 className={styles.title}>Solar System</h1>
         <div className={styles.track}>
           <div className={styles.fill} style={{ width: `${displayed}%` }} />
         </div>
