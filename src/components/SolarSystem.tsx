@@ -124,17 +124,8 @@ export default function SolarSystem() {
   const [muted, setMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  const cardOpenSound = useMemo(() => {
-    const sound = new Audio('/sounds/card-open.mp3');
-    sound.volume = 0.15;
-    sound.playbackRate = 2;
-    return sound;
-  }, []);
-
   const handlePlanetClick = (planetName: string) => {
     playCardOpen();
-    cardOpenSound.currentTime = 0;
-    cardOpenSound.play().catch(() => {});
     setSelectedPlanet(planetName);
   }
 
