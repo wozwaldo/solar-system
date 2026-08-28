@@ -131,12 +131,6 @@ export default function SolarSystem() {
     return sound;
   }, []);
 
-  const cardCloseSound = useMemo(() => {
-    const sound = new Audio('/sounds/card-close.mp3');
-    sound.volume = 0.15;
-    return sound;
-  }, []);
-
   const handlePlanetClick = (planetName: string) => {
     playCardOpen();
     cardOpenSound.currentTime = 0;
@@ -146,8 +140,6 @@ export default function SolarSystem() {
 
   const handleClose = () => {
     playCardClose();
-    cardCloseSound.currentTime = 0;
-    cardCloseSound.play().catch(() => {});
     setSelectedPlanet(null);
     setResetCamera(true);
   };
